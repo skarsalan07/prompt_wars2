@@ -43,6 +43,10 @@ export const assistantChatSchema = z.object({
   demoPersona: z.string().optional(),
 });
 
+export const insightAnalyzeInputSchema = journalEntryInputSchema.extend({
+  demoPersona: z.string().optional(),
+});
+
 export const mergePayloadSchema = z.object({
   profile: profileSchema,
   journalEntries: z.array(z.unknown()),

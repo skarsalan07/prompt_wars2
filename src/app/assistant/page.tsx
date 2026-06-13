@@ -23,6 +23,7 @@ export default function AssistantPage() {
           title="Conversational support that remembers what matters"
         />
         <form
+          aria-busy={loading}
           className="space-y-4"
           onSubmit={async (event) => {
             event.preventDefault();
@@ -40,7 +41,9 @@ export default function AssistantPage() {
               value={message}
             />
           </label>
-          <Button type="submit">{loading ? "Coaching..." : "Generate personalized support"}</Button>
+          <Button disabled={loading} type="submit">
+            {loading ? "Coaching..." : "Generate personalized support"}
+          </Button>
         </form>
       </Card>
 
@@ -68,6 +71,11 @@ export default function AssistantPage() {
           </p>
           <p className="text-xs leading-6 text-[var(--muted)]">
             {response?.meta?.reason ?? "Judge Demo mode uses the server AI route when an API key is configured."}
+          </p>
+          <p aria-live="polite" className="sr-only" role="status">
+            {response
+              ? `Coach response generated with ${response.meta?.usedLiveModel ? "live" : "fallback"} ${response.meta?.provider ?? "local"} AI.`
+              : "No coach response has been generated yet."}
           </p>
           <div className="grid gap-3">
             {(response?.recommendedExercises ?? [

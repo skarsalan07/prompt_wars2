@@ -34,6 +34,11 @@ body {
   font-family: var(--font-space-grotesk), sans-serif;
 }
 
+:where(a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
 h1,
 h2,
 h3,

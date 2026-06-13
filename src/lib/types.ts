@@ -38,6 +38,8 @@ export type TriggerCategory = (typeof TRIGGER_CATEGORIES)[number];
 export type PatternType = (typeof PATTERN_TYPES)[number];
 export type AppMode = "guest" | "demo" | "authenticated";
 export type AIProvider = "groq" | "gemini" | "local";
+export type MoodScale = number;
+export type BurnoutRiskLevel = RiskBand;
 
 export interface StudentProfile {
   id: string;
@@ -124,6 +126,18 @@ export interface TriggerClusterSummary {
   mentionDates: string[];
 }
 
+export type TriggerCluster = TriggerClusterSummary;
+
+export interface StressTrigger {
+  label: string;
+  category: TriggerCategory;
+  severity: number;
+  confidence: number;
+  evidenceSnippet: string;
+  source: "journal" | "mood";
+  entryDate: string;
+}
+
 export interface ForecastPoint {
   riskBand: RiskBand;
   probability: number;
@@ -133,6 +147,14 @@ export interface ForecastPoint {
 export interface BurnoutForecast {
   currentRiskBand: RiskBand;
   currentScore: number;
+  forecast7d: ForecastPoint;
+  forecast30d: ForecastPoint;
+  reasonFactors: string[];
+}
+
+export interface BurnoutRiskSummary {
+  level: BurnoutRiskLevel;
+  score: number;
   forecast7d: ForecastPoint;
   forecast30d: ForecastPoint;
   reasonFactors: string[];
@@ -262,6 +284,38 @@ export interface CoachResponse {
   suggestedPrompts: string[];
   safetyFlag: SafetyFlag;
   meta?: AIResponseMeta;
+}
+
+export interface AssistantTurnRequest {
+  message: string;
+  mode?: AppMode;
+  demoPersona?: string;
+}
+
+export type AssistantTurnResponse = CoachResponse;
+
+export interface InsightAnalyzeRequest {
+  title: string;
+  reflectionPrompt: string;
+  text: string;
+  entryDate: string;
+  examType: ExamType;
+  mode?: AppMode;
+  demoPersona?: string;
+}
+
+export interface InsightAnalyzeResponse {
+  emotionVector: EmotionVector;
+  stressTriggers: StressTrigger[];
+  burnoutRisk: BurnoutRiskSummary;
+  anxietyIndicators: string[];
+  motivationIndex: number;
+  recommendedActions: string[];
+  confidence: number;
+  evidenceSpans: string[];
+  safetyFlag: SafetyFlag;
+  analysis: InsightAnalysisResult;
+  meta: AIResponseMeta;
 }
 
 export interface JournalAnalysisResponse {

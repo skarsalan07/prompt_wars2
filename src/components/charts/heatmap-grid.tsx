@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 import type { HeatmapCell } from "@/lib/types";
 
 import { cn } from "@/lib/utils";
@@ -27,6 +29,10 @@ export function HeatmapGrid({
   metric: "mood" | "stress" | "confidence" | "motivation";
   title: string;
 }) {
+  const summaryId = useId();
+  const visibleCells = cells.slice(-28);
+  const highestValueCell = [...visibleCells].sort((left, right) => right[metric] - left[metric])[0];
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -37,12 +43,18 @@ export function HeatmapGrid({
           Darker warm tones indicate higher strain; teal signals stronger recovery.
         </p>
       </div>
+      <p className="sr-only" id={summaryId}>
+        {visibleCells.length
+          ? `${title} for the latest ${visibleCells.length} days. Highest ${metric} was ${highestValueCell?.[metric] ?? 0} out of 10 on ${highestValueCell?.date ?? "an unavailable date"}.`
+          : `No ${metric} heatmap data is available yet.`}
+      </p>
       <div
+        aria-describedby={summaryId}
         aria-label={`${title} heatmap`}
         className="grid grid-cols-7 gap-2 md:grid-cols-9"
         role="img"
       >
-        {cells.slice(-28).map((cell, index) => (
+        {visibleCells.map((cell, index) => (
           <div
             key={`${metric}-${cell.date}-${index}`}
             aria-label={`${cell.date}: ${metric} ${cell[metric]} out of 10`}

@@ -242,27 +242,25 @@ export function AppDataProvider({
   async function addJournalEntry(payload: JournalInput) {
     let result = buildLocalJournalResponse(snapshot, payload);
 
-    if (mode === "demo" || mode === "authenticated") {
-      try {
-        const query = mode === "demo" ? `?demoPersona=${encodeURIComponent(demoPersonaId)}` : "";
-        const response = await fetch(`/api/journal-entries${query}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...payload,
-            examType: snapshot.profile.examType,
-            mode,
-          }),
-        });
+    try {
+      const query = mode === "demo" ? `?demoPersona=${encodeURIComponent(demoPersonaId)}` : "";
+      const response = await fetch(`/api/journal-entries${query}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...payload,
+          examType: snapshot.profile.examType,
+          mode,
+        }),
+      });
 
-        if (response.ok) {
-          result = (await response.json()) as JournalAnalysisResponse;
-        }
-      } catch {
-        // Keep the deterministic local fallback result.
+      if (response.ok) {
+        result = (await response.json()) as JournalAnalysisResponse;
       }
+    } catch {
+      // Keep the deterministic local fallback result.
     }
 
     const nextSnapshot = deriveWellnessSnapshot(
@@ -346,27 +344,24 @@ export function AppDataProvider({
   }
 
   async function askCoach(message: string): Promise<CoachResponse> {
-    if (mode === "demo" || mode === "authenticated") {
-      try {
-        const query = mode === "demo" ? `?demoPersona=${encodeURIComponent(demoPersonaId)}` : "";
-        const response = await fetch("/api/assistant/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message,
-            mode,
-            demoPersona: mode === "demo" ? demoPersonaId : undefined,
-          }),
-        });
+    try {
+      const response = await fetch("/api/assistant/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          mode,
+          demoPersona: mode === "demo" ? demoPersonaId : undefined,
+        }),
+      });
 
-        if (response.ok) {
-          return (await response.json()) as CoachResponse;
-        }
-      } catch {
-        // Fall back to local response below.
+      if (response.ok) {
+        return (await response.json()) as CoachResponse;
       }
+    } catch {
+      // Fall back to local response below.
     }
 
     return buildCoachResponse(snapshot, message);

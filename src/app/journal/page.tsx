@@ -30,6 +30,7 @@ export default function JournalPage() {
           title="Private reflection with AI pattern discovery"
         />
         <form
+          aria-busy={loading}
           className="space-y-4"
           onSubmit={async (event) => {
             event.preventDefault();
@@ -74,7 +75,9 @@ export default function JournalPage() {
               value={text}
             />
           </label>
-          <Button type="submit">{loading ? "Analyzing..." : "Analyze reflection"}</Button>
+          <Button disabled={loading} type="submit">
+            {loading ? "Analyzing..." : "Analyze reflection"}
+          </Button>
         </form>
       </Card>
 
@@ -97,6 +100,11 @@ export default function JournalPage() {
           <p className="text-sm leading-7 text-[var(--muted)]">
             {result?.meta.reason ??
               "Submit a reflection in Judge Demo mode with a configured API key to force a live Groq or Gemini call."}
+          </p>
+          <p aria-live="polite" className="sr-only" role="status">
+            {result
+              ? `Analysis completed using ${result.meta.usedLiveModel ? "live" : "fallback"} ${result.meta.provider}.`
+              : "No reflection has been analyzed yet."}
           </p>
           <div className="grid gap-3">
             {(result?.analysis.recommendedActions ?? snapshot.recoveryPlan.tasks.slice(0, 3).map((task) => task.description)).map((action) => (

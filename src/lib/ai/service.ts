@@ -11,6 +11,22 @@ import type {
   JournalEntry,
 } from "@/lib/types";
 
+export type EnhancedInsightAnalysisResult = InsightAnalysisResult & {
+  analysis: InsightAnalysisResult;
+  meta: AIResponseMeta;
+};
+
+function wrapInsightAnalysis(
+  analysis: InsightAnalysisResult,
+  meta: AIResponseMeta,
+): EnhancedInsightAnalysisResult {
+  return {
+    ...analysis,
+    analysis,
+    meta,
+  };
+}
+
 function getAdapter() {
   return (process.env.AI_PROVIDER ?? "groq") === "gemini"
     ? new GeminiAdapter()
@@ -21,7 +37,7 @@ export async function enhanceInsightAnalysis(
   snapshot: DemoSnapshot,
   journalEntry: JournalEntry,
   baseResult: InsightAnalysisResult,
-) {
+): Promise<EnhancedInsightAnalysisResult> {
   const fallback = {
     insightSummary:
       `${snapshot.profile.name.split(" ")[0]} is showing pressure around ${snapshot.topTriggers[0]?.canonicalLabel ?? "motivation stability"} ` +
@@ -52,15 +68,15 @@ export async function enhanceInsightAnalysis(
   const parsed = aiInsightEnhancementSchema.safeParse(output);
   const normalized = parsed.success ? parsed.data : fallback;
 
-  return {
-    analysis: {
+  return wrapInsightAnalysis(
+    {
       ...baseResult,
       recommendedActions: normalized.recommendedActions,
       evidenceSpans: journalEntry.triggerMentions.map((trigger) => trigger.evidenceSnippet),
       confidence: Math.max(baseResult.confidence, 0.74),
     } satisfies InsightAnalysisResult,
     meta,
-  };
+  );
 }
 
 export async function generateCoachReply(

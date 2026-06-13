@@ -29,6 +29,21 @@ flowchart TD
   J --> K
 ```
 
+## Product Flow Diagram
+```mermaid
+flowchart LR
+  A[Student opens app] --> B{Mode}
+  B -->|Judge Demo| C[Seeded persona snapshot]
+  B -->|Guest| D[Local-first workspace]
+  B -->|Authenticated| E[Mongo-backed profile]
+  C --> F[Journal + Mood + Analytics]
+  D --> F
+  E --> F
+  F --> G[Trigger discovery + burnout forecast]
+  G --> H[AI coach + recovery plan]
+  H --> I[Next-day reflection loop]
+```
+
 ## Feature Architecture
 - **Input layer**: journaling, mood logs, profile context, event tags
 - **Deterministic analytics layer**: trigger extraction, burnout scoring, motivation calculation, pattern rules, recovery logic
@@ -112,9 +127,63 @@ flowchart LR
   J --> H
 ```
 
+## Data Flow Diagram
+```mermaid
+flowchart TD
+  A[Journal text + mood logs] --> B[Zod validation]
+  B --> C[Deterministic analytics engine]
+  C --> D[Derived snapshot]
+  D --> E[EmotionalInsights cache]
+  D --> F[Prompt contracts]
+  F --> G[Groq or Gemini adapter]
+  G --> H[Schema-validated JSON output]
+  H --> I[Dashboard, coach, recovery UI]
+  D --> J[Users, JournalEntries, MoodLogs, WellnessPlans]
+```
+
+## Safety Flow Diagram
+```mermaid
+flowchart TD
+  A[Incoming request] --> B[CSRF + rate limit]
+  B --> C[Zod schema validation]
+  C --> D[Prompt-input sanitization]
+  D --> E{Prompt injection?}
+  E -->|Yes| F[Reject request]
+  E -->|No| G[Deterministic analysis]
+  G --> H{Crisis-risk language?}
+  H -->|Yes| I[Urgent support guidance]
+  H -->|No| J[Standard coaching response]
+  I --> K[Safe UI rendering]
+  J --> K
+```
+
+## Why This Wins Diagram
+```mermaid
+flowchart LR
+  A[Exam-specific context] --> E[Judge-visible differentiation]
+  B[Hidden trigger discovery] --> E
+  C[Burnout forecasting] --> E
+  D[Live AI with fallback safety] --> E
+  E --> F[Immediate demo credibility]
+```
+
+## Engineer-Facing System Diagram
+```mermaid
+flowchart LR
+  A[App Router pages] --> B[Route handlers]
+  B --> C[Validation + security helpers]
+  C --> D[Analytics engines]
+  D --> E[AI adapters]
+  D --> F[Mongo repository]
+  F --> G[(MongoDB Atlas)]
+  E --> H[(Groq / Gemini)]
+  D --> I[Seed/demo snapshot generator]
+```
+
 ## API Surface
 - `POST /api/journal-entries`
 - `POST /api/mood-logs`
+- `POST /api/insights/analyze`
 - `GET /api/analytics/summary`
 - `GET /api/analytics/heatmap`
 - `GET /api/triggers/summary`

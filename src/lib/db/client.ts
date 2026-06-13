@@ -16,5 +16,10 @@ export async function getMongoClient() {
     global.__mongoClientPromise = client.connect();
   }
 
-  return global.__mongoClientPromise;
+  try {
+    return await global.__mongoClientPromise;
+  } catch {
+    global.__mongoClientPromise = undefined;
+    return null;
+  }
 }

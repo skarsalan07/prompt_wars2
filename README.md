@@ -65,7 +65,7 @@ Latest verified results in this workspace:
 - `npm run lint` ✅
 - `npm test` ✅
 - `npm run build` ✅
-- `npm run coverage` ✅ with `89.7%` statements, `91.89%` functions, and `89.41%` lines on the scoring-critical logic surface
+- `npm run coverage` ✅ with `90.02%` statements, `93.69%` functions, and `89.47%` lines on the scoring-critical logic surface
 
 ## Judge Demo
 - Use the top navigation toggle to switch between `Judge Demo` and `Your Workspace`.

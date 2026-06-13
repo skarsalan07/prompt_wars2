@@ -55,6 +55,7 @@ vi.mock("@/lib/ai/service", async () => ({
 import { GET as getAnalyticsSummary } from "@/app/api/analytics/summary/route";
 import { GET as getAnalyticsHeatmap } from "@/app/api/analytics/heatmap/route";
 import { POST as postAssistantChat } from "@/app/api/assistant/chat/route";
+import { POST as postInsightAnalyze } from "@/app/api/insights/analyze/route";
 import { POST as postJournalEntry } from "@/app/api/journal-entries/route";
 import { POST as postMoodLog } from "@/app/api/mood-logs/route";
 import { GET as getPatternInsights } from "@/app/api/insights/patterns/route";
@@ -149,6 +150,31 @@ describe("public route handlers", () => {
     const blockedResponse = await postJournalEntry(blockedRequest);
 
     expect(blockedResponse.status).toBe(400);
+  });
+
+  it("returns the competition-facing insights analysis contract", async () => {
+    const request = new NextRequest("http://localhost/api/insights/analyze", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: "http://localhost",
+        host: "localhost",
+      },
+      body: JSON.stringify({
+        title: "Insight request",
+        reflectionPrompt: "What felt heavy today?",
+        text: "I kept comparing myself after a low mock score, and that pressure made it hard to sleep.",
+        entryDate: "2026-06-13",
+        examType: "JEE",
+        mode: "guest",
+      }),
+    });
+    const response = await postInsightAnalyze(request);
+    const data = await response.json();
+
+    expect(data.stressTriggers.length).toBeGreaterThan(0);
+    expect(data.burnoutRisk.level).toBeTruthy();
+    expect(data.recommendedActions.length).toBeGreaterThanOrEqual(3);
   });
 
   it("returns mood log updates and coach replies", async () => {
